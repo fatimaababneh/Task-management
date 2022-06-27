@@ -1,0 +1,35 @@
+npx sequelize-cli model:generate --name Users --attributes username:string,name:string,phone:string,age:integer
+
+npx sequelize-cli model:generate --name Category --attributes name:string,description:string
+
+npx sequelize-cli model:generate --name Task --attributes subject:string,description:string,type:string,claimed:BOOLEAN,assignee_name:string,impact:string,severity:string,due_time:string,due_date:string,estimated_time:string,tags name:string
+
+npx sequelize-cli model:generate --name SubCategory --attributes name:string,description:string
+
+npx sequelize-cli seed:generate --name Users
+npx sequelize-cli db:seed:all
+
+npx sequelize-cli db:seed --seed seeders/20220216092617-Users.js
+
+ Task.init({
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    task_id:DataTypes.STRING,
+    subject: DataTypes.STRING,
+    description: DataTypes.STRING,
+    type: DataTypes.STRING,
+    claimed: DataTypes.BOOLEAN,
+    assignee_name: DataTypes.STRING,
+    impact: DataTypes.STRING,
+    severity: DataTypes.STRING,
+    due_time: DataTypes.STRING,
+    due_date: DataTypes.STRING,
+    estimated_time: DataTypes.STRING,
+    tags_name: DataTypes.STRING,
+  }, {
+    sequelize,
+    modelName: 'Task',
+  });
