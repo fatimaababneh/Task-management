@@ -8,11 +8,12 @@ app.use(express.json());
 app.use(cors());
 
 const carRoute = require("./routers/routes/car");
-
+const taskRoute = require("./routers/routes/task");
 
 app.use("/cars", carRoute);
+app.use("/task", taskRoute);
 ////////////////////////////
-const Port = 6000;
+const Port = 30000;
 app.listen(Port, () => {
-  console.log("server is running");
+  console.log(`http://localhost:${Port}`);
 });
