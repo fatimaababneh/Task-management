@@ -10,7 +10,7 @@ const {
 } = require("../controllers/task");
 
 taskRoute.get("/", getAlltasks);
-taskRoute.get("/task/:id", gettask);
+taskRoute.get("/info/:id", gettask);
 taskRoute.post("/", addtask);
 taskRoute.put("/edit/:id", updatetask);
 taskRoute.put("/:id", deleteTask);

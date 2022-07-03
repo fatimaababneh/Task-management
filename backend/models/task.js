@@ -24,7 +24,6 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.STRING,
     type: DataTypes.STRING,
     claimed: DataTypes.BOOLEAN,
-    assignee_name: DataTypes.STRING,
     impact: DataTypes.STRING,
     severity: DataTypes.STRING,
     impact_text: DataTypes.STRING,

@@ -1,10 +1,8 @@
 npx sequelize-cli model:generate --name Users --attributes username:string,name:string,phone:string,age:integer
 
-npx sequelize-cli model:generate --name Category --attributes name:string,description:string
-
 npx sequelize-cli model:generate --name Task --attributes subject:string,description:string,type:string,claimed:BOOLEAN,assignee_name:string,impact:string,severity:string,due_time:string,due_date:string,estimated_time:string,tags name:string
 
-npx sequelize-cli model:generate --name SubCategory --attributes name:string,description:string
+npx sequelize-cli model:generate --name Assignee --attributes name:string,phone:string,age:integer
 
 npx sequelize-cli seed:generate --name Users
 npx sequelize-cli db:seed:all
