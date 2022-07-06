@@ -7,7 +7,7 @@
       <div class="text-center">
 
         <template>
-          <v-card>
+          <v-card v-if="tasks.length">
             <v-card-title>
               Task data
               <v-spacer></v-spacer>
@@ -16,32 +16,9 @@
 
             </v-card-title>
             <v-data-table :headers="headers" :items="tasks" :search="search">
-                        <template>
-                          <v-row justify="center">
-                            <v-btn
-                              class="white--text"
-                              color="teal"
-                              @click="overlay = !overlay"
-                            >
-                              Show Overlay
-                            </v-btn>
 
-                            <v-overlay
-                              :z-index="zIndex"
-                              :value="overlay"
-                            >
-                              <v-btn
-                                class="white--text"
-                                color="teal"
-                                @click="overlay = false"
-                              >
-                                Hide Overlay
-                              </v-btn>
-                            </v-overlay>
-                          </v-row>
-                        </template>
               <template v-slot:item.update="{ item }" v-slot:activator="{ on, attrs }">
-                <v-icon @click="updateTask(item)" v-on="on" small>
+                <v-icon @click="updateTask(item)" small>
                   mdi-menu
                 </v-icon>
 
@@ -50,6 +27,14 @@
                 <v-icon small class="mr-2" @click="deleteTask(item.task_id)">
                   mdi-delete
                 </v-icon>
+              </template>
+              <template v-slot:item.assignee_name="{ item }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span v-bind="attrs" v-on="on"> user name</span>
+                  </template>
+                  <span> {{ showAssig(item.assignee_name) }} </span>
+                </v-tooltip>
               </template>
             </v-data-table>
           </v-card>
@@ -90,8 +75,8 @@
                       </v-checkbox>
                       <label>Asignee Name</label>
                       <v-col cols="8">
-                        <v-autocomplete v-model="assignee_name" :items="assignee" item-text="user_name" return-object dense chips small-chips label="Solo"
-                          multiple solo></v-autocomplete>
+                        <v-autocomplete v-model="assignee_name" :items="assignee" item-text="user_name" return-object
+                          dense chips small-chips label="Asignee name" multiple solo></v-autocomplete>
                       </v-col>
                     </div>
                   </div>
@@ -110,13 +95,13 @@
                                 Low
                               </template>
                             </v-checkbox>
-                            <v-checkbox  item-value="2"
+                            <v-checkbox item-value="2"
                               style="background:rgb(238, 236, 236); height:30px; color:black; border-radius:4px;">
                               <template v-slot:label>
                                 Medium
                               </template>
                             </v-checkbox>
-                            <v-checkbox  item-value="3"
+                            <v-checkbox item-value="3"
                               style="background-color:rgb(238, 236, 236); height:30px; color:black; border-radius:4px;">
                               <template v-slot:label>
                                 High
@@ -151,18 +136,13 @@
                           </v-row>
                           <v-textarea class="text-1" v-model="severity_text" filled label="Two rows" rows="1"
                             row-height="5"></v-textarea>
-                            </v-col>
-                            </v-col>
-                            </div>
-                            <div class="scnd-row-col2">
+                        </v-col>
+                      </v-col>
+                    </div>
+                    <div class="scnd-row-col2">
 
-                      <v-textarea field-input class="text-1" style="width:20vh; height: inherit;" v-model="due_time"
-                        filled auto-grow label="Time" rows="1" row-height="10">
-                      </v-textarea>
-                      <v-textarea class="text-1" style="width:20vh;" v-model="due_date" filled auto-grow label="Date"
-                        rows="1" row-height="10"></v-textarea>
-                      <v-textarea class="text-1" style="width:20vh;" v-model="estmated_time" filled auto-grow
-                        label="time" rows="1" row-height="10"></v-textarea>
+                      <Time :time="due_time" @time="onTimeBicker" />
+                      <Date :date="due_date" @date="onDateBicker" />
 
                     </div>
                   </div>
@@ -249,25 +229,22 @@ export default {
       impact_text: "",
       severity_text: "",
       due_time: "",
-      due_date: "",
+      due_date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       estmated_time: "",
       checkbox: null,
       dialog2: false,
       edit_form: null,
       assignee_name: "",
-      task_id:null,
+      task_id: null,
       assignee: [],
-      e4: null,
-      overlay: false,
-      zIndex: 0
+      e4: null
     };
   },
   methods: {
     async addData(e) {
       this.dialog = false;
       e.preventDefault();
-      
-        await axios
+      await axios
         .post("http://localhost:30000/task", {
           subject: this.subject,
           description: this.description,
@@ -281,32 +258,36 @@ export default {
           due_date: this.due_date,
           estmated_time: this.estmated_time
         })
-      .then((response)=>{
-        this.showdata();
-        this.task_id=response.data.task_id
-        this.insertAssignee(this.task_id)
+        .then((response) => {
+          this.showdata();
+          this.task_id = response.data.task_id
+          this.insertAssignee(this.task_id)
+          this.subject = "",
+            this.description = "",
+            this.type = "",
+            this.claimed = "",
+            this.impact = "",
+            this.impact_flag = false,
+            this.severity = "",
+            this.impact_text = "",
+            this.severity_text = "",
+            this.due_time = "",
+            this.due_date = "",
+            this.estmated_time = "",
+            this.assignee_name = ""
 
-      this.subject= "",
-      this.description= "",
-      this.type= "",
-      this.claimed= "",
-      this.impact= "",
-      this.impact_flag= false,
-      this.severity= "",
-      this.impact_text= "",
-      this.severity_text= "",
-      this.due_time= "",
-      this.due_date= "",
-      this.estmated_time= "",
-      this.assignee_name=""
-
-        // console.log(this.tasks[0].assignee_name)
-
-      })
-      .catch ((error)=> {
-        console.log(error);
-      })
-
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    },
+    onTimeBicker(value) {
+      console.log(value)
+      this.due_time = value
+    },
+    onDateBicker(value) {
+      console.log(value)
+      this.due_date = value
     },
     async deleteTask(id) {
       this.dialog = false;
@@ -321,30 +302,28 @@ export default {
         });
     },
     updateTask(item) {
-      // console.log(item);
       this.edit_form = item
       this.dialog2 = true
     },
-    async insertAssignee(task_id){
-
-      console.log(task_id)
-      await axios .post(`http://localhost:30000/assignee/${task_id}`,{user:this.assignee_name})
-        .then((res) => {
-          // console.log(res)
+    async insertAssignee(task_id) {
+      try {
+        const response = await axios.post(`http://localhost:30000/assignee/${task_id}`, {
+          user: this.assignee_name
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        this.showdata();
+        // this.showAssig();
+        } 
+        catch (error) {
+      }
     },
     /////get all tasks
     async showdata() {
-      this.addData()
       await axios
         .get("http://localhost:30000/task")
         .then((res) => {
           this.alltasks = res.data;
           this.tasks = this.alltasks;
-
+          this.showAssig()
         })
         .catch((err) => {
           console.log(err);
@@ -361,11 +340,27 @@ export default {
         .catch((err) => {
           console.log(err);
         });
+    },
+    showAssig(arr) {
+      let str = ""
+      for (let i = 0; i < arr.length; i++) {
+        str += `${arr[i].user_name} ,`
+      }
+      return str
     }
   },
   mounted() {
     this.showdata()
-    this.showUsers();
+    this.showUsers()
+
+  },
+  watch: {
+    assignee_name() {
+      if (this.assignee_name.length != 0) {
+
+      }
+    }
+
   },
   components: { Edit }
 }
@@ -407,7 +402,7 @@ export default {
 .scnd-row-col2 {
   padding: .3em;
   border-top: 2px solid rgb(125, 221, 200);
-  width: 110vh;
+  // width: 110vh;
   margin-left: 1em;
   display: grid;
   grid-template-columns: 200px 200px;

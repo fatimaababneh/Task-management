@@ -1,7 +1,6 @@
 <template>
     <div>
         <template>
-
             <v-row justify="center">
                 <v-dialog v-model="dialog" persistent max-width="700px" height="850px">
                     <!-- {{ data_form }} -->
@@ -27,9 +26,13 @@
                                     <v-col cols="12" sm="6" md="4">
                                         <v-text-field label="claimed" v-model="claimed" required></v-text-field>
                                     </v-col>
-                                    <v-col cols="12" sm="6" md="4">
+                                    <!-- <v-col cols="12" sm="6" md="4">
                                         <v-text-field label="assignee name" v-model="assignee_name"
                                             hint="example of helper text only on focus"></v-text-field>
+                                    </v-col> -->
+                                    <v-col cols="12" sm="6" md="4">
+                                    <v-autocomplete v-model="assignee_name" :items="assignee" item-text="user_name" return-object
+                                    dense chips small-chips label="Asignee name" multiple solo></v-autocomplete>
                                     </v-col>
                                     <v-col cols="12" sm="6" md="4">
                                         <v-text-field label="Impact*" v-model="impact_text"
@@ -49,7 +52,7 @@
                                         </v-text-field>
                                     </v-col>
                                     <v-col cols="12" sm="6" md="4">
-                                        <v-text-field label="estimated time*" v-model="estmated_date"
+                                        <v-text-field label="estimated time*" v-model="estmated_time"
                                             hint="example of persistent helper text" persistent-hint required>
                                         </v-text-field>
                                     </v-col>
@@ -97,28 +100,30 @@ export default {
             due_date: this.data_form.due_date,
             estmated_time: this.data_form.estmated_time,
             toggle: false,
-            data_updated:''
+            data_updated:'',
+            assignee:null
         }
     },
-
     methods: {
         async updateTask() {
             this.dialog = false
+            // console.log(this.assignee_name)
             await axios.put(`http://localhost:30000/task/edit/${this.data_form.task_id}`,{
                 subject: this.subject,
                 description: this.description,
                 type: this.type,
                 claimed: this.claimed,
-                assignee_name: this.assignee_name,
                 impact: this.impact,
                 severity: this.severity,
                 impact_text: this.impact_text,
                 severity_text: this.severity_text,
                 due_time: this.due_time,
                 due_date: this.due_date,
-                estmated_time: this.estmated_time
+                estmated_time: this.estmated_time,
+                assignee:this.assignee_name
+                
             })
-            
+
                 .then((res) => {
                         this.$emit('update');
                         this.$emit('close');
@@ -127,11 +132,22 @@ export default {
                     console.log(error);
                 });
         },
-        info() {
-            console.log(this.data_form, "edit")
-        }
+        async showUsers() {
+        await axios
+        .get("https://62207663ce99a7de195a41c3.mockapi.io/users/users")
+        .then((res) => {
+          this.assignee = res.data
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+    allassignee(){
+
+    }
     },
     mounted() {
+        this.showUsers() 
     }
 }
 </script>
