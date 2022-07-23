@@ -335,7 +335,6 @@ export default {
         .get("https://62207663ce99a7de195a41c3.mockapi.io/users/users")
         .then((res) => {
           this.assignee = res.data
-
         })
         .catch((err) => {
           console.log(err);
